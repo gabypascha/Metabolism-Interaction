@@ -138,6 +138,21 @@ public class Main {
                      System.out.println();
                  }
              }
+        public String[][] resizeArray(String[][] stringThingy){
+        for(int i=0;i<stringThingy.length;i++){
+            for(int j=0;j<stringThingy[i].length;i++){
+                if(stringThingy[i][j]==null){
+                    String[] resizedArray= new String[j];
+                    for (int k=0;k<j;k++){
+                        resizedArray[k]=stringThingy[i][k];
+                    }
+                    stringThingy[i]=resizedArray;
+                    break;
+                }
+            }
+        }
+        return stringThingy;
+    }
 
     }
 
