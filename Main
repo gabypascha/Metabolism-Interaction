@@ -1,0 +1,158 @@
+import java.util.*;
+import java.io.*;
+
+
+public class Main {
+    // use this to read in a matrix as long as you know DB name, DB path, number of rows, collumns
+    public static String[][] ReadDBnow(String DBname, String DBpath, int rowno, int colno) throws FileNotFoundException, IOException {
+
+        //DBname eg. <"databaseKey.csv">, DBpath eg. <"C:/Users/sebmu/IdeaProjects/1stday/databaseKey.csv">
+
+        String[][] arrayValues = new String[rowno][colno]; //The returned matrix
+
+        //File file = new File(DBname);
+
+        BufferedReader bufRdr = new BufferedReader(new FileReader(DBpath));
+        String line = null;
+        int row = 0;
+        int col = 0;
+
+        //read each line of text file
+        while ((line = bufRdr.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            while (st.hasMoreTokens()) {
+                //get next token and store it in the array
+                arrayValues[row][col] = st.nextToken();
+                col++;
+            }
+            col = 0;
+            row++;
+        }
+        //close the file
+        bufRdr.close();
+
+        return arrayValues;
+    }
+
+    public static String[] FindCriteriaMatrix(String[][] BigMatrix, int Questionno) {
+        String[] CriteriaMatrix = new String[Questionno];
+
+        int c = 0;
+
+        for (int i = 1; i < BigMatrix.length; i++) {
+            CriteriaMatrix[c] = BigMatrix[i][0];
+
+            while ((i < (BigMatrix.length - 1)) && (BigMatrix[i][1] != null)) {
+                i += 1;
+            }
+            c += 1;
+        }
+        return CriteriaMatrix;
+    }
+
+    public static String[][] FindSpeciesMatrix(String[][] BigMatrix, int Questionno, int TotalNoOfAnswers) {
+        String[][] SpeciesMatrix = new String[Questionno][TotalNoOfAnswers];
+
+        int c = 0;
+        int s = 0;
+
+        for (int i = 1; i < BigMatrix.length; i++) {
+            while ((i < (BigMatrix.length - 1) && (BigMatrix[i][1] != null))) {
+                SpeciesMatrix[c][s] = BigMatrix[i][1];
+                s += 1;
+                i += 1;
+            }
+            c += 1;
+            s = 0;
+        }
+        return SpeciesMatrix;
+    }
+
+    public static String[][][] FindValuesMatrix(String[][] BigMatrix, int Questionno, int TotalNoOfAnswers) {
+
+        String[][][] ValuesMatrix = new String[Questionno][TotalNoOfAnswers][BigMatrix[0].length];
+
+        int c = 0;
+        int s = 0;
+
+        for (int i = 1; i < BigMatrix.length; i++) {
+            while ((BigMatrix[i][1] != null) && (i < (BigMatrix.length - 1))) {
+                for (int x = 2; x < BigMatrix[0].length; x++)
+                    ValuesMatrix[c][s][x-2] = BigMatrix[i][x];
+                s += 1;
+                i += 1;
+            }
+            c += 1;
+            s = 0;
+        }
+        return ValuesMatrix;
+    }
+
+
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+        int rowno = 128; // Total Rown Number for the DB matrix
+        int colno = 184; // Total Collumn Number for the DB matrix
+        int QuestionNo = 33;
+        int TotalAnswers = 14; //94;//14;
+
+        String[][] DataBase;
+        DataBase = ReadDBnow("databaseKey.csv", "C:/Users/sebmu/IdeaProjects/1stday/databaseKey.csv", rowno, colno);
+
+       /* for (int i = 0; i < rowno; i++) {
+            for (int j = 0; j < 10; j++)
+                System.out.print(DataBase[i][j] + ' ');
+            System.out.println();
+        }*/
+
+        String[] CriteriaMatrix = new String[QuestionNo];
+        CriteriaMatrix = FindCriteriaMatrix(DataBase, QuestionNo);
+
+        String[][] SpeciesMatrix = new String[QuestionNo][TotalAnswers];
+        SpeciesMatrix = resizedArray(FindSpeciesMatrix(DataBase, QuestionNo, TotalAnswers));
+
+        String[][][] ValuesMatrix = new String[QuestionNo][TotalAnswers][colno-2];
+        ValuesMatrix = FindValuesMatrix(DataBase, QuestionNo, TotalAnswers);
+
+        /*     for (int i = 0; i < QuestionNo; i++){
+                 System.out.println(CriteriaMatrix[i] + "   ");
+             }*/
+
+
+
+      /*  for (int i = 0; i<QuestionNo; i++){
+            for (int j = 0; j < SpeciesMatrix[i].length; j++)
+               // if (SpeciesMatrix[i][j] != null)
+                    System.out.print(SpeciesMatrix[i][j]+ "   ");
+            System.out.println();
+        } */
+
+             for (int i = 0; i< QuestionNo; i++){
+                 System.out.println(CriteriaMatrix[i]);
+                 for (int j = 0; j < TotalAnswers; j++){
+                     if (SpeciesMatrix[i][j] != null)
+                        System.out.print(SpeciesMatrix[i][j]);
+                     System.out.println();
+                     for (int k = 0; k < (ValuesMatrix[i][j].length-2); k++)
+                         if(ValuesMatrix[i][j][k] != null)
+                            System.out.print(ValuesMatrix[i][j][k]);
+                     System.out.println();
+                 }
+             }
+        public String[][] resizeArray(String[][] stringThingy){
+        for(int i=0;i<stringThingy.length;i++){
+            for(int j=0;j<stringThingy[i].length;j++){
+                if(stringThingy[i][j]==null){
+                    String[] resizedArray= new String[j];
+                    for (int k=0;k<j;k++){
+                        resizedArray[k]=stringThingy[i][k];
+                    }
+                    stringThingy[i]=resizedArray;
+                    break;
+                }
+            }
+        }
+        return stringThingy;
+    }
+
+    }
+}
