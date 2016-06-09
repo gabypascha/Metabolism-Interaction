@@ -1,0 +1,52 @@
+import java.util.*;
+import java.io.*;
+
+
+public class Main
+{
+    // use this to read in a matrix as long as you know DB name, DB path, number of rows, collumns
+    public static String[][] ReadDBnow(String DBname, String DBpath, int rowno, int colno) throws FileNotFoundException, IOException {
+
+        //DBname eg. <"databaseKey.csv">, DBpath eg. <"C:/Users/sebmu/IdeaProjects/1stday/databaseKey.csv">
+
+        String[][] arrayValues = new String[rowno][colno]; //The returned matrix
+
+        //File file = new File(DBname);
+
+        BufferedReader bufRdr = new BufferedReader(new FileReader(DBpath));
+        String line = null;
+        int row = 0;
+        int col = 0;
+
+        //read each line of text file
+        while ((line = bufRdr.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            while (st.hasMoreTokens()) {
+                //get next token and store it in the array
+                arrayValues[row][col] = st.nextToken();
+                col++;
+            }
+            col = 0;
+            row++;
+        }
+        //close the file
+        bufRdr.close();
+
+        return arrayValues;
+    }
+
+    public static void main(String[] args) throws FileNotFoundException, IOException
+        {
+            int rowno = 128; // Total Rown Number for the DB matrix
+            int colno = 188; // Total Collumn Number for the DB matrix
+
+            String[][] DataBase;
+            DataBase = ReadDBnow("database.csv", "C:/Users/sebmu/IdeaProjects/1stday/databaseKey.csv", rowno, colno);
+
+            for (int i = 0; i < rowno; i++){
+                for (int j = 0; j < colno; j++)
+                    System.out.print(DataBase[i][j] + ' ');
+                System.out.println();
+            }
+        }
+    }
