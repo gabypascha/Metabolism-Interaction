@@ -108,7 +108,7 @@ public class Main {
         CriteriaMatrix = FindCriteriaMatrix(DataBase, QuestionNo);
 
         String[][] SpeciesMatrix = new String[QuestionNo][TotalAnswers];
-        SpeciesMatrix = FindSpeciesMatrix(DataBase, QuestionNo, TotalAnswers);
+        SpeciesMatrix = resizedArray(FindSpeciesMatrix(DataBase, QuestionNo, TotalAnswers));
 
         String[][][] ValuesMatrix = new String[QuestionNo][TotalAnswers][colno-2];
         ValuesMatrix = FindValuesMatrix(DataBase, QuestionNo, TotalAnswers);
@@ -140,7 +140,7 @@ public class Main {
              }
         public String[][] resizeArray(String[][] stringThingy){
         for(int i=0;i<stringThingy.length;i++){
-            for(int j=0;j<stringThingy[i].length;i++){
+            for(int j=0;j<stringThingy[i].length;j++){
                 if(stringThingy[i][j]==null){
                     String[] resizedArray= new String[j];
                     for (int k=0;k<j;k++){
