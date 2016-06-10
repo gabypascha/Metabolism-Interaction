@@ -128,10 +128,8 @@ public class Main {
 
              for (int i = 0; i< QuestionNo; i++){
                  System.out.println(CriteriaMatrix[i]);
-                 for (int j = 0; j < TotalAnswers; j++){
-                     if (SpeciesMatrix[i][j] != null)
-                        System.out.print(SpeciesMatrix[i][j]);
-                     System.out.println();
+                 for (int j = 0; j < SpeciesMatrix[i].length; j++){
+                     System.out.println(SpeciesMatrix[i][j]);
                      for (int k = 0; k < (ValuesMatrix[i][j].length-2); k++)
                          if(ValuesMatrix[i][j][k] != null)
                             System.out.print(ValuesMatrix[i][j][k]);
