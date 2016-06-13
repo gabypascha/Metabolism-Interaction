@@ -1,3 +1,4 @@
+import javax.swing.JOptionPane;
 import java.util.*;
 import java.io.*;
 
@@ -211,8 +212,7 @@ public class Main {
                         noZeros++;
                     //THIS IS THE PART THAT COULD BE MODIFIED TO GET SOMETHING BETTER !!!
                     else
-                        sumLine += ValueMatrix[i][j][k] * Pointforspecies[k] * Pointforspecies[k];
-
+                        sumLine += ValueMatrix[i][j][k] *Math.pow(Pointforspecies[k], 20);
                 }
                 index += sumLine * noZeros / Pointforspecies.length;
             }
@@ -227,6 +227,12 @@ public class Main {
     // Alex's maximal loss algorythm.
     public static int algorythm2(double[][][] ValueMatrix,int[] Pointforspecies,boolean[] AlredyAskedQuest){
         double[] EfficiencyIndex=new double[ValueMatrix[0][0].length];
+        int max=0;
+        for(int i=0;i<Pointforspecies.length;i++){
+            if(Pointforspecies[i]>max)
+                max=Pointforspecies[i];
+        }
+
 
         for(int i=0;i<ValueMatrix.length;i++) {
             int minRej = ValueMatrix[0][0].length;
@@ -236,8 +242,10 @@ public class Main {
                     int noZeros = 0;
 
                     for (int k = 0; k < ValueMatrix[i][j].length; k++) {
-                        if (ValueMatrix[i][j][k] == 0)
-                            noZeros++;
+                        if(Pointforspecies[k]==max) {
+                            if (ValueMatrix[i][j][k] == 0)
+                                noZeros++;
+                        }
                     }
                     if(noZeros<minRej)
                         minRej=noZeros;
@@ -250,27 +258,47 @@ public class Main {
         return IndexMaxInArray(EfficiencyIndex);
     }
 
-    // For the simulations, chooses a random answer in the possible answers possible.
-    public static int randomAnswerChoose(int questionNo, double [][][] ValuesMatrix, int speciesno){
-        int oneSum=0;
-        for(int i=0;i<ValuesMatrix[questionNo].length;i++){
-            if(ValuesMatrix[questionNo][i][speciesno]!=0)
-                oneSum++;
+    // Choooses a random answer that is correct or false for the simulation.
+    public static int randomAnswerChooseWithError(int questionNo, double [][][] ValuesMatrix, int speciesno,int ErrorFreq){
+        int randErr=(int) (Math.random()*ErrorFreq);
+        if (randErr==1||ErrorFreq==1){
+            int oneSum=0;
+            for(int i=0;i<ValuesMatrix[questionNo].length;i++){
+                if(ValuesMatrix[questionNo][i][speciesno]==0)
+                    oneSum++;
+            }
+            int rand= (int) (Math.random()*oneSum);
+            int match=0;
+            for(int i=0;i<ValuesMatrix[questionNo].length;i++){
+                if(ValuesMatrix[questionNo][i][speciesno]==0) {
+                    if (match == rand)
+                        return i + 1;
+                    match++;
+                }
+            }
         }
-        int rand= (int) (Math.random()*oneSum);
-        int match=0;
-        for(int i=0;i<ValuesMatrix[questionNo].length;i++){
-            if(ValuesMatrix[questionNo][i][speciesno]!=0) {
-                if (match == rand)
-                    return i + 1;
-                match++;
+
+        else{
+            int oneSum = 0;
+            for (int i = 0; i < ValuesMatrix[questionNo].length; i++) {
+                if (ValuesMatrix[questionNo][i][speciesno] != 0)
+                    oneSum++;
+            }
+            int rand = (int) (Math.random() * oneSum);
+            int match = 0;
+            for (int i = 0; i < ValuesMatrix[questionNo].length; i++) {
+                if (ValuesMatrix[questionNo][i][speciesno] != 0) {
+                    if (match == rand)
+                        return i + 1;
+                    match++;
+                }
             }
         }
 
         return -1;
     }
 
-    //The method you need to call to start normal "game" were te computer figures out the plant for you.
+    //The method you need to call to start normal "game" where te computer figures out the plant for you.
     public static void userQuestions() throws  IOException {
         int rowno = 143; // Total Rown Number for the DB matrix
         int colno = 179; // Total Collumn Number for the DB matrix
@@ -297,12 +325,19 @@ public class Main {
         for(int i=0; i<CriteriaMatrix.length+1;i++){
             while(Answ==0) {
                 alreadyAskedQuest[ChoiceQuest] = true;
-                System.out.println(CriteriaMatrix[ChoiceQuest] + ":");
+                String PrintedString =CriteriaMatrix[ChoiceQuest] + ":";
+                //System.out.println(CriteriaMatrix[ChoiceQuest] + ":");
+
                 for (int j = 0; j < SpeciesMatrix[ChoiceQuest].length; j++) {
-                    System.out.println(j + 1 + ". " + SpeciesMatrix[ChoiceQuest][j]);
+                    //System.out.println(j + 1 + ". " + SpeciesMatrix[ChoiceQuest][j]);
+                    PrintedString+="\n"+(j + 1)+ ". " + SpeciesMatrix[ChoiceQuest][j];
                 }
-                System.out.println("\nWhat category is the plant in ? (put in the number, if you don't know put in 0)");
-                Answ = scanner.nextInt();
+
+
+                Answ= Integer.parseInt(JOptionPane.showInputDialog(PrintedString+"\nWhat category is the plant in ? (put in the number, if you don't know put in 0)"));
+                //System.out.println("\nWhat category is the plant in ? (put in the number, if you don't know put in 0)");
+                //Answ = scanner.nextInt();
+
                 if(Answ==0) {
                     ChoiceQuest = algorythm(ValuesMatrix, noPoints, alreadyAskedQuest);
                     i++;
@@ -334,12 +369,14 @@ public class Main {
 
 
         }
-
-        System.out.println("The Species you are looking at is: "+AllSpecies[IndexMaxInArray(noPoints)]);
+        //System.out.println("The Species you are looking at is: "+AllSpecies[IndexMaxInArray(noPoints)]);
+        //JOptionPane.showInputDialog("The Species you are looking at is: "+AllSpecies[IndexMaxInArray(noPoints)]);
+        JOptionPane.showMessageDialog(null,"The Species you are looking at is: "+AllSpecies[IndexMaxInArray(noPoints)]);
     }
 
-    //Simulation with Database2.csv and algorythm()
-    public static double simulation2() throws IOException {
+
+    // simulation
+    public static double simulations(int Database, int algorythm, int errFreq, int numberSimul) throws IOException{
         int rowno = 143; // Total Rown Number for the DB matrix
         int colno = 179; // Total Collumn Number for the DB matrix
         int QuestionNo = 34;
@@ -348,210 +385,74 @@ public class Main {
         int AnswRepPerSpe=0;
 
         String[][] DataBase;
-        //DataBase = ReadDBnow("Database.csv", rowno, colno);
-        DataBase = ReadDBnow("Database2.csv", rowno, colno);
+        DataBase = ReadDBnow("Database"+ Database+".csv", rowno, colno);
         String[] CriteriaMatrix = FindCriteriaMatrix(DataBase, QuestionNo);
         String[][] SpeciesMatrix = resizeArray(FindSpeciesMatrix(DataBase, QuestionNo, TotalAnswers));
         double[][][] ValuesMatrix = integerArray(reszeArray(FindValuesMatrix(DataBase, QuestionNo, TotalAnswers)));
         String[] AllSpecies = All177Species(DataBase);
-        for(int s=0;s<AllSpecies.length;s++) {
-            int[] noPoints = new int[AllSpecies.length];
-            for (int i = 0; i < noPoints.length; i++)
-                noPoints[i] = 1;
+        double avg=0;
+        for (int n=0;n<numberSimul;n++) {
+            for (int s = 0; s < AllSpecies.length; s++) {
+                int[] noPoints = new int[AllSpecies.length];
+                for (int i = 0; i < noPoints.length; i++)
+                    noPoints[i] = 1;
 
-            boolean[] alreadyAskedQuest = new boolean[CriteriaMatrix.length];
+                boolean[] alreadyAskedQuest = new boolean[CriteriaMatrix.length];
 
-            int ChoiceQuest = 32;
+                int ChoiceQuest = 32;
 
-            for (int i = 0; AnswRepPerSpe < CriteriaMatrix.length; i++) {
-                AnswRepPerSpe++;
-                alreadyAskedQuest[ChoiceQuest] = true;
-                //System.out.println(CriteriaMatrix[ChoiceQuest] + ":");
-                for (int j = 0; j < SpeciesMatrix[ChoiceQuest].length; j++) {
-                    //System.out.println(j + 1 + ". " + SpeciesMatrix[ChoiceQuest][j]);
-                }
-                //System.out.println("\nWhat category is the plant in ? (put in the number)");
-                int Answ = randomAnswerChoose(ChoiceQuest, ValuesMatrix, s);
-                while(Answ==-1) {
+                for (int i = 0; AnswRepPerSpe < CriteriaMatrix.length; i++) {
                     AnswRepPerSpe++;
-                    alreadyAskedQuest[ChoiceQuest]=true;
-                    ChoiceQuest=algorythm(ValuesMatrix,noPoints,alreadyAskedQuest);
-                    Answ=randomAnswerChoose(ChoiceQuest, ValuesMatrix, s);
-                }
-                //System.out.println(Answ);
-
-                for (int j = 0; j < noPoints.length; j++) {
-                    if (ValuesMatrix[ChoiceQuest][Answ - 1][j] != 0) {
-                        noPoints[j]++;
+                    alreadyAskedQuest[ChoiceQuest] = true;
+                    //System.out.println(CriteriaMatrix[ChoiceQuest] + ":");
+                    for (int j = 0; j < SpeciesMatrix[ChoiceQuest].length; j++) {
+                        //System.out.println(j + 1 + ". " + SpeciesMatrix[ChoiceQuest][j]);
                     }
-                }
-
-                int PossAnsw = IndexMaxInArray(noPoints);
-                boolean finnish = true;
-                for (int j = 0; j < noPoints.length; j++) {
-                    if (j != PossAnsw && noPoints[PossAnsw] - 1 < noPoints[j]) {
-                        finnish = false;
+                    //System.out.println("\nWhat category is the plant in ? (put in the number)");
+                    int Answ = randomAnswerChooseWithError(ChoiceQuest, ValuesMatrix, s, errFreq);
+                    while (Answ == -1) {
+                        AnswRepPerSpe++;
+                        alreadyAskedQuest[ChoiceQuest] = true;
+                        if (algorythm == 1)
+                            ChoiceQuest = algorythm(ValuesMatrix, noPoints, alreadyAskedQuest);
+                        else if (algorythm == 2)
+                            ChoiceQuest = algorythm2(ValuesMatrix, noPoints, alreadyAskedQuest);
+                        Answ = randomAnswerChooseWithError(ChoiceQuest, ValuesMatrix, s, errFreq);
                     }
-                }
-                if (finnish)
-                    break;
+                    //System.out.println(Answ);
 
-                ChoiceQuest = algorythm(ValuesMatrix, noPoints, alreadyAskedQuest);
+                    for (int j = 0; j < noPoints.length; j++) {
+                        if (ValuesMatrix[ChoiceQuest][Answ - 1][j] != 0) {
+                            noPoints[j]++;
+                        }
+                    }
+
+                    int PossAnsw = IndexMaxInArray(noPoints);
+                    boolean finnish = true;
+                    for (int j = 0; j < noPoints.length; j++) {
+                        if (j != PossAnsw && noPoints[PossAnsw] - 1 < noPoints[j]) {
+                            finnish = false;
+                        }
+                    }
+                    if (finnish && PossAnsw == s)
+                        break;
+
+                    if (algorythm == 1)
+                        ChoiceQuest = algorythm(ValuesMatrix, noPoints, alreadyAskedQuest);
+                    else if (algorythm == 2)
+                        ChoiceQuest = algorythm2(ValuesMatrix, noPoints, alreadyAskedQuest);
+                }
+                //System.out.println(AllSpecies[s]+" "+AllSpecies[IndexMaxInArray(noPoints)]+" :"+AnswRepPerSpe);
+                totAnswerReplies += AnswRepPerSpe;
+                AnswRepPerSpe = 0;
+
+                //System.out.println("The Species you are looking at is: " + AllSpecies[IndexMaxInArray(noPoints)]);
             }
-            //System.out.println(AllSpecies[s]+" "+AllSpecies[IndexMaxInArray(noPoints)]+" :"+AnswRepPerSpe);
-            totAnswerReplies+=AnswRepPerSpe;
-            AnswRepPerSpe=0;
-            //System.out.println("The Species you are looking at is: " + AllSpecies[IndexMaxInArray(noPoints)]);
         }
-        double avg=((double) totAnswerReplies)/AllSpecies.length;
         //System.out.println("Average n° of questions: "+avg);
-        return avg;
+        return ((double) totAnswerReplies) / AllSpecies.length/numberSimul;
+
     }
-
-    //Simulation with Database.csv and algorythm()
-    public static double simulation1() throws IOException {
-        int rowno = 143; // Total Rown Number for the DB matrix
-        int colno = 179; // Total Collumn Number for the DB matrix
-        int QuestionNo = 34;
-        int TotalAnswers = 14; //94;//14;
-        int totAnswerReplies=0;
-        int AnswRepPerSpe=0;
-
-
-        String[][] DataBase;
-        //DataBase = ReadDBnow("Database.csv", rowno, colno);
-        DataBase = ReadDBnow("Database.csv", rowno, colno);
-        String[] CriteriaMatrix = FindCriteriaMatrix(DataBase, QuestionNo);
-        String[][] SpeciesMatrix = resizeArray(FindSpeciesMatrix(DataBase, QuestionNo, TotalAnswers));
-        double[][][] ValuesMatrix = integerArray(reszeArray(FindValuesMatrix(DataBase, QuestionNo, TotalAnswers)));
-        String[] AllSpecies = All177Species(DataBase);
-        for(int s=0;s<AllSpecies.length;s++) {
-            int[] noPoints = new int[AllSpecies.length];
-            for (int i = 0; i < noPoints.length; i++)
-                noPoints[i] = 1;
-
-            boolean[] alreadyAskedQuest = new boolean[CriteriaMatrix.length];
-
-            int ChoiceQuest = 32;
-
-            for (int i = 0; AnswRepPerSpe < CriteriaMatrix.length; i++) {
-                AnswRepPerSpe++;
-                alreadyAskedQuest[ChoiceQuest] = true;
-                //System.out.println(CriteriaMatrix[ChoiceQuest] + ":");
-                for (int j = 0; j < SpeciesMatrix[ChoiceQuest].length; j++) {
-                    //System.out.println(j + 1 + ". " + SpeciesMatrix[ChoiceQuest][j]);
-                }
-                //System.out.println("\nWhat category is the plant in ? (put in the number)");
-                int Answ = randomAnswerChoose(ChoiceQuest, ValuesMatrix, s);
-                while(Answ==-1) {
-                    AnswRepPerSpe++;
-                    alreadyAskedQuest[ChoiceQuest]=true;
-                    ChoiceQuest=algorythm(ValuesMatrix,noPoints,alreadyAskedQuest);
-                    Answ=randomAnswerChoose(ChoiceQuest, ValuesMatrix, s);
-                }
-                //System.out.println(Answ);
-
-                for (int j = 0; j < noPoints.length; j++) {
-                    if (ValuesMatrix[ChoiceQuest][Answ - 1][j] != 0) {
-                        noPoints[j]++;
-                    }
-                }
-
-                int PossAnsw = IndexMaxInArray(noPoints);
-                boolean finnish = true;
-                for (int j = 0; j < noPoints.length; j++) {
-                    if (j != PossAnsw && noPoints[PossAnsw] - 1 < noPoints[j]) {
-                        finnish = false;
-                    }
-                }
-                if (finnish)
-                    break;
-
-                ChoiceQuest = algorythm(ValuesMatrix, noPoints, alreadyAskedQuest);
-            }
-
-            //System.out.println(AllSpecies[s]+" "+AllSpecies[IndexMaxInArray(noPoints)]+" :"+AnswRepPerSpe);
-            totAnswerReplies+=AnswRepPerSpe;
-            AnswRepPerSpe=0;
-
-            //System.out.println("The Species you are looking at is: " + AllSpecies[IndexMaxInArray(noPoints)]);
-        }
-        double avg=((double) totAnswerReplies)/AllSpecies.length;
-        //System.out.println("Average n° of questions: "+avg);
-        return avg;
-    }
-
-    //Simulation with Database2.csv and algorythm2()
-    public static double simulation3() throws IOException {
-        int rowno = 143; // Total Rown Number for the DB matrix
-        int colno = 179; // Total Collumn Number for the DB matrix
-        int QuestionNo = 34;
-        int TotalAnswers = 14; //94;//14;
-        int totAnswerReplies=0;
-        int AnswRepPerSpe=0;
-
-        String[][] DataBase;
-        //DataBase = ReadDBnow("Database.csv", rowno, colno);
-        DataBase = ReadDBnow("Database2.csv", rowno, colno);
-        String[] CriteriaMatrix = FindCriteriaMatrix(DataBase, QuestionNo);
-        String[][] SpeciesMatrix = resizeArray(FindSpeciesMatrix(DataBase, QuestionNo, TotalAnswers));
-        double[][][] ValuesMatrix = integerArray(reszeArray(FindValuesMatrix(DataBase, QuestionNo, TotalAnswers)));
-        String[] AllSpecies = All177Species(DataBase);
-        for(int s=0;s<AllSpecies.length;s++) {
-            int[] noPoints = new int[AllSpecies.length];
-            for (int i = 0; i < noPoints.length; i++)
-                noPoints[i] = 1;
-
-            boolean[] alreadyAskedQuest = new boolean[CriteriaMatrix.length];
-
-            int ChoiceQuest = 32;
-
-            for (int i = 0; AnswRepPerSpe < CriteriaMatrix.length; i++) {
-                AnswRepPerSpe++;
-                alreadyAskedQuest[ChoiceQuest] = true;
-                //System.out.println(CriteriaMatrix[ChoiceQuest] + ":");
-                for (int j = 0; j < SpeciesMatrix[ChoiceQuest].length; j++) {
-                    //System.out.println(j + 1 + ". " + SpeciesMatrix[ChoiceQuest][j]);
-                }
-                //System.out.println("\nWhat category is the plant in ? (put in the number)");
-                int Answ = randomAnswerChoose(ChoiceQuest, ValuesMatrix, s);
-                while(Answ==-1) {
-                    AnswRepPerSpe++;
-                    alreadyAskedQuest[ChoiceQuest]=true;
-                    ChoiceQuest=algorythm2(ValuesMatrix,noPoints,alreadyAskedQuest);
-                    Answ=randomAnswerChoose(ChoiceQuest, ValuesMatrix, s);
-                }
-                //System.out.println(Answ);
-
-                for (int j = 0; j < noPoints.length; j++) {
-                    if (ValuesMatrix[ChoiceQuest][Answ - 1][j] != 0) {
-                        noPoints[j]++;
-                    }
-                }
-
-                int PossAnsw = IndexMaxInArray(noPoints);
-                boolean finnish = true;
-                for (int j = 0; j < noPoints.length; j++) {
-                    if (j != PossAnsw && noPoints[PossAnsw] - 1 < noPoints[j]) {
-                        finnish = false;
-                    }
-                }
-                if (finnish)
-                    break;
-
-                ChoiceQuest = algorythm2(ValuesMatrix, noPoints, alreadyAskedQuest);
-            }
-            //System.out.println(AllSpecies[s]+" "+AllSpecies[IndexMaxInArray(noPoints)]+" :"+AnswRepPerSpe);
-            totAnswerReplies+=AnswRepPerSpe;
-            AnswRepPerSpe=0;
-
-            //System.out.println("The Species you are looking at is: " + AllSpecies[IndexMaxInArray(noPoints)]);
-        }
-        double avg=((double) totAnswerReplies)/AllSpecies.length;
-        //System.out.println("Average n° of questions: "+avg);
-        return avg;
-    }
-
 
     public static void main(String[] args) throws IOException {
 
@@ -559,18 +460,13 @@ public class Main {
 
         // If you want to play the normal game, uncomment userQuestions. And comment the rest.
 
-        //userQuestions();
-
-
-        double avgPerSimulation1=0;
-        double avgPerSimulation2=0;
-        double avgPerSimulation3=0;
+        userQuestions();
 
         /*Calculates the average n° of questions used for each method,
 
-        - simulation1() is with the Database with ones and zeros (Alex's preffered one) and the algorythm we made.
-        -simulation2() is with the Database with 1,0.5,0.3333,0 (Julian's preffered one) and the algorythm we made. (AND IT WORKS BETTER!!!)
-        -simulation3() is with the Database with 1,0.5,0.3333,0 (Julian's preffered one) and with Alex's idea of minimu loss.
+        -simulation1() is with the Database with ones and zeros (Alex's preffered one) and the algorythm we made.
+        -simulation2() is with the Database with 1,0.5,0.3333,0 (Julian's preffered one) and the algorythm we made.
+        -simulation3() is with the Database with 1,0.5,0.3333,0 (Julian's preffered one) and with Alex's idea of minimum loss.
 
         The simulations returns the average number of questions asked for each species (around 9 to 10)
         This can vary quite a bit because in the simulation when there is multiple choice possible, the computer chooses
@@ -578,17 +474,15 @@ public class Main {
 
          */
 
-
-
-        for(int i=0;i<20;i++) {
-            avgPerSimulation1 += simulation1();
-            avgPerSimulation2 += simulation2();
-            avgPerSimulation3 += simulation3();
-        }
-
-        System.out.println("There is on average "+avgPerSimulation1/20+" questions for simultaion 1.");
-        System.out.println("There is on average "+avgPerSimulation2/20+" question for simulation 2.");
-        System.out.println("There is on average "+avgPerSimulation3/20+" questions for simulation 3.");
+        /*
+        int numSimul=1;
+        int numErr=10;
+        System.out.println("There is on average "+simulations(1,1,numErr,numSimul)+" questions for simultaion 1.");
+        System.out.println("There is on average "+simulations(2,1,numErr,numSimul)+" question for simulation 2.");
+        System.out.println("There is on average "+simulations(2,2,numErr,numSimul)+" questions for simulation 3.");
+        */
 
     }
+
+
 }
