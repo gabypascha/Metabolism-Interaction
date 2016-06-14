@@ -1,0 +1,229 @@
+import javafx.scene.layout.Border;
+import javafx.scene.layout.HBox;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.awt.BorderLayout;
+
+interface Game {
+    public String getclick(int cell);
+}
+
+class AnswerBoard implements Game {
+    private String[] board;
+
+    public AnswerBoard(String[] GUIanswers) {
+        board = new String[20];
+        for (int u = 0; u < Main.Lengthanswers; u++)
+            board[u] = GUIanswers[u];
+    }
+
+    public String getclick(int cell) {
+        return board[cell];
+    }
+}
+
+class AnswerPanel extends JPanel {
+
+    ImageIcon cell = new ImageIcon("cell.png");
+
+    private Image getScaledImage(Image srcImg, int w, int h){
+        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = resizedImg.createGraphics();
+
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(srcImg, 0, 0, w, h, null);
+        g2.dispose();
+
+        return resizedImg;
+    }
+
+    private JLabel[][] labels;
+
+    AnswerPanel(int x, int y) {
+        GridLayout layout = new GridLayout(x, y, 0, 0);
+        setLayout(layout);
+
+        labels = new JLabel[x][y];
+        for (int r = 0; r < x; r++)
+            for (int c = 0; c < y; c++) {
+                labels[r][c] = new JLabel();
+                add(labels[r][c]);
+            }
+    }
+
+    public void addImag(String[] GUIanswers, int row, int col) {
+        labels[row][col].setIcon(null);
+        labels[row][col].setIcon(new ImageIcon(getScaledImage(cell.getImage(), GUI.panelwidth/Main.Lengthanswers, GUI.panelheight)));
+        repaint();
+    }
+
+    public void redrawWorld(String[] GUIanswers) {
+        for (int r = 0; r < 1; r++)
+            for (int c = 0; c < Main.Lengthanswers; c++)
+                addImag(GUIanswers, r, c);
+    }
+
+    public void finals() {
+        for (int r = 0; r < 1; r++)
+            for (int c = 0; c < Main.Lengthanswers; c++){
+                labels[r][c].setIcon(null);
+                repaint();
+            }
+    }
+}
+
+class QuestionPanel extends JPanel{
+    private JLabel questionlabel;
+    QuestionPanel (int x, int y) {
+        GridLayout layout = new GridLayout(x, y, 0, 0);
+        setLayout(layout);
+
+        questionlabel = new JLabel();
+        add(questionlabel);
+    }
+
+    public void addQues(String question){
+        questionlabel.setText(null);
+        questionlabel.setText(question + " " + "\nWhat category is the plant in ? (put in the number, if you don't know put in 0)");
+    }
+
+    public void finals (String Final) {
+        questionlabel.setText(null);
+        questionlabel.setText(Final);
+    }
+}
+
+class TextyPanel extends JPanel {
+
+    private JLabel[][] textylabels;
+
+    TextyPanel(int x, int y) {
+        GridLayout layout = new GridLayout(x, y, 0, 0);
+        setLayout(layout);
+
+        textylabels = new JLabel[x][y];
+        for (int r = 0; r < x; r++)
+            for (int c = 0; c < y; c++) {
+                textylabels[r][c] = new JLabel();
+                add(textylabels[r][c]);
+            }
+    }
+
+    public void addText(String[] GUIanswers, int row, int col) {
+        textylabels[row][col].setText(null);
+        if (col == (Main.Lengthanswers-1))
+            textylabels[row][col].setText("I don't know");
+        else textylabels[row][col].setText(GUIanswers[col]);
+        repaint();
+    }
+
+    public void redrawtext(String[] GUIanswers) {
+        for (int r = 0; r < 1; r++)
+            for (int c = 0; c < Main.Lengthanswers; c++)
+                addText(GUIanswers, r, c);
+    }
+
+    public void finals() {
+        for (int r = 0; r < 1; r++)
+            for (int c = 0; c < Main.Lengthanswers; c++)
+                textylabels[r][c].setText(null);
+    }
+}
+
+    class MouseEventTrapper implements MouseListener {
+
+        private AnswerPanel panel;
+        public double clickedcol, clickedrow;
+
+        MouseEventTrapper(AnswerPanel panel) {
+            this.panel = panel;
+        }
+
+        public void mouseClicked(java.awt.event.MouseEvent e) {
+            clickedcol = (double) e.getX() / GUI.panelwidth * Main.Lengthanswers;
+            clickedrow = (double) e.getY() / 100;
+            int row = (int) clickedrow;
+            int col = (int) clickedcol;
+
+            if ((clickedrow >= 2) && (clickedrow < 5)) {
+                if (e.getX() >= (GUI.panelwidth/Main.Lengthanswers*(Main.Lengthanswers-1)))
+                    Main.GUIscores[0] = "1";
+                else Main.GUIscores[col] = "1";
+                panel.redrawWorld(Main.GUIanswers);
+            }
+        }
+
+        public void mousePressed(java.awt.event.MouseEvent e) {
+        }
+
+        public void mouseReleased(java.awt.event.MouseEvent e) {
+        }
+
+        public void mouseEntered(java.awt.event.MouseEvent e) {
+        }
+
+        public void mouseExited(java.awt.event.MouseEvent e) {
+        }
+    }
+
+    public class GUI {
+        private JFrame frame;
+        private AnswerPanel panel;
+        private QuestionPanel panelquestion;
+        private TextyPanel panelanswer;
+        public static int panelheight = 300;
+        public static int panelwidth = 900;
+
+        public GUI() {
+        }
+
+        public void init() {
+
+
+            frame = new JFrame("Plant Sieving");
+            frame.setPreferredSize(new Dimension(panelwidth, panelheight * 5 / 3));
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            panel = new AnswerPanel(1, Main.Lengthanswers);
+            panel.setSize(panelwidth, panelheight);
+
+            panelquestion = new QuestionPanel(1, 1);
+            panelquestion.setSize(panelwidth, panelheight / 3);
+
+            panelanswer = new TextyPanel(1, Main.Lengthanswers);
+            panelanswer.setSize(panelwidth, panelheight / 3);
+
+
+            JPanel mainPanel = new JPanel();
+            mainPanel.setLayout(new BorderLayout(3, 3));
+            mainPanel.add(panelquestion, BorderLayout.NORTH);
+            mainPanel.add(panel, BorderLayout.SOUTH);
+            mainPanel.add(panelanswer, BorderLayout.CENTER);
+
+            frame.add(mainPanel);
+
+            if (Main.FinalAnswer != null){
+                panelquestion.finals(Main.FinalAnswer);
+                panelanswer.finals();
+                panel.finals();
+            } else {
+                panelquestion.addQues(Main.CurrentQuestion);
+                panel.redrawWorld(Main.GUIanswers);
+                panelanswer.redrawtext(Main.GUIanswers);
+            }
+
+
+
+            frame.addMouseListener(new MouseEventTrapper(panel));
+
+
+
+            frame.pack();
+            frame.setVisible(true);
+        }
+    }
+
