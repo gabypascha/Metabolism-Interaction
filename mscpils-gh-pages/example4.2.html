@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>d3.js example</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--
+
+Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity.nl>
+
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+
+-->
+
+  <!-- ops.js -->
+  <script src="lib/jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="lib/purl.js"></script>
+  <script type="text/javascript" src="src/combined.js"></script>
+
+<!--librarys used-->
+
+  <!-- d3.js -->
+  <script src="lib/d3.v3.min.js" charset="utf-8"></script>
+  <!-- Do not delete d3 things-->
+
+  <style>
+    div {
+      font-family: "Courier New", monospace;
+      white-space: pre;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>OpenPHACTS / d3.js mash up</h3>
+  <!--Title-->
+  <p>This example lists the number of activities for Acetyl-COA and then </p>
+  <!--Discription on top-->
+  <h4>JSON 1</h4>
+  <div class="json" id="json1">Pending...</div>
+
+  <h7>Inchi Key</h7>
+  <div class="inchikey" id="inchikey1">Pending...</div>
+  <h8>Molecular Formula</h8>
+  <div class="molformula" id="molformula1">Pending...</div>
+
+
+
+  <script type="text/javascript">
+
+var sources2 = new CompoundSearch("https://beta.openphacts.org/2.1", "673a7995", "1445635a05fa1abfc159001e7b9c49fa");
+
+var callback = function(success, status, response){
+  if (success && status == 200) {
+    d3.select("#json1").html(JSON.stringify(response, undefined, 2));
+
+if(response.primaryTopic.exactMatch[0].inchiKey.hasOwnProperty)<!--what am i doing with life?-->
+
+    inchikeyy = response.primaryTopic.exactMatch[0].inchiKey
+    console.log("Inchi Key " + inchikeyy);
+    d3.select("#inchikey1").html(inchikeyy);
+
+
+  }
+   else {
+    d3.select("#json1").html("Error while calling the compoundPharmacology webservice: " + status + " " + success);
+  }
+};
+
+
+for(i=1;i<2;i++){
+  if(i<10000){
+    a=0;
+  }
+  else a="";
+  if(i<1000){
+    b=0;
+  }
+  else b=""
+  if(i<100){
+    c=0;
+  }else c="";
+if (i<10){
+  d=0;
+}else d="";
+  sources2.fetchCompound("http://www.hmdb.ca/metabolites/HMDB00098", null, callback);
+}
+
+
+
+  </script>
+</body>
+</html>

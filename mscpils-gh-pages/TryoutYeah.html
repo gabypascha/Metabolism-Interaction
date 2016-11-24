@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Count by entity</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <!-- ops.js -->
+  <script src="lib/jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="lib/purl.js"></script>
+  <script type="text/javascript" src="src/combined.js"></script>
+
+  <!-- d3.js -->
+  <script src="lib/d3.v3.min.js" charset="utf-8"></script>
+
+  <style>
+    div {
+      font-family: "Calibri", monospace;
+      white-space: pre;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>OpenPHACTS / d3.js mash up</h3>
+  <p>This example lists the number of activities for paracetamol by unit.</p>
+  <div class="chart"></div>
+  <h4>JSON 1</h4>
+  <div class="json" id="json1">Pending...</div>
+
+  <!-- dynamically create a table with type information -->
+  <script type="text/javascript">
+
+
+var sources = new PathwaySearch("https://beta.openphacts.org/2.1", "995682d0", "53e7cd2ff74d7ed0c409b9ffdb7e6086");
+
+
+var callback = function(success, status, response){
+  if (success || status == 200) {
+    d3.select("#json1").html(JSON.stringify(response, undefined, 2));
+
+    count = response.primaryTopic.interactions_count
+    console.log("Hit count: " + count);
+    
+
+
+  } else {
+    d3.select("#json1").html("Error while calling the countInteractionsByEntity webservice: " + status);
+  }
+};
+
+for(i=1;i<100;i++){
+if(i<10000){
+a=0;
+if(i<1000){
+b=0;
+if(i<100){
+c=0;
+if(i<10){
+d=0;
+}
+else
+d="";
+}
+else
+c="";
+}
+else
+b="";
+}
+else
+a="";
+
+sources.countInteractionsByEntity("http://www.hmdb.ca/metabolites/HMDB"+a+b+c+d+i,  null, null, null, callback
+);
+}
+
+
+
+
+  </script>
+</body>
+</html>
+
