@@ -74,19 +74,20 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
   <div class="inchikey" id="inchikey1">Pending...</div>
   <h5>Molecular Formula</h5>
   <div class="molformula" id="molformula1">Pending...</div>
-  <h5>list?</h5>
-  <div class="maxtrix" id="maxtrix1">Pending...</div>
+  <h4>JSON 3</h4>
+  <div class="json" id="json3">Pending...</div>
+
 
   <h4>JSON 1</h4>
   <div class="json" id="json1">Pending...</div>
   <h4>JSON 2</h4>
   <div class="json" id="json2">Pending...</div>
-  <h4>JSON 3</h4>
-  <div class="json" id="json3">Pending...</div>
+  <h4>JSON 4</h4>
+  <div class="json" id="json4">Pending...</div>
 
 
   <script type="text/javascript">
-totalCount=62183;
+totalCount=50;
 count1=0;
 count2=0;
 var sources = new PathwaySearch("https://beta.openphacts.org/2.1", "673a7995", "1445635a05fa1abfc159001e7b9c49fa");
@@ -102,7 +103,11 @@ var callback = function(success, status, response){
  endstring=endstring.substring(endstring.length-9,endstring.length)
  numberArray=parseInt(endstring.substring(4,9))
  console.log(numberArray)
- list[numberArray]=count
+ list[numberArray]=count;
+ if(sum[count]==null){
+   sum[count]=1
+ }else{
+sum[count]=sum[count]+1;}
   }
    else {
     d3.select("#json1").html("Error while calling the compoundPharmacology webservice: " + status + " " + success);
@@ -113,7 +118,12 @@ if(count1==totalCount&&count2==totalCount){
 
        youhou+=list[i]+","+listIK[i]+","+listMF[i]+"\n";
      }
+     summ="";
+     for(j=1;j<=sum.length;j++){
+       sum+=j+","+sum[j]+"\n";
+     }
     d3.select("#json3").html(youhou);
+    d3.select("#json4").html(summ);
     }
 };
 var callback2 = function(success, status, response){
@@ -180,6 +190,8 @@ var listIK=[];
 console.log(listIK);
 var listMF=[];
 console.log(listMF);
+var sum=[];
+console.log(sum);
   </script>
 
 </body>
