@@ -1,3 +1,20 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @gabypascha
+ Watch 1
+  Star 0
+  Fork 0 gabypascha/Metabolism-Interaction
+ Code  Issues 0  Pull requests 0  Projects 1  Wiki  Pulse  Graphs  Settings
+Branch: master Find file Copy pathMetabolism-Interaction/mscpils-gh-pages/example4.3.html
+41fdeb8  just now
+@gabypascha gabypascha Update example4.3.html
+2 contributors @gabypascha @julicot9
+RawBlameHistory
+181 lines (150 sloc)  5.34 KB
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,9 +22,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <!--
-
 Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity.nl>
-
  Permission is hereby granted, free of charge, to any person
  obtaining a copy of this software and associated documentation
  files (the "Software"), to deal in the Software without
@@ -16,10 +31,8 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
  copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following
  conditions:
-
  The above copyright notice and this permission notice shall be
  included in all copies or substantial portions of the Software.
-
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,7 +41,6 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  OTHER DEALINGS IN THE SOFTWARE.
-
 -->
 
   <!-- ops.js -->
@@ -74,14 +86,11 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
 
 
   <script type="text/javascript">
-
-totalCount=100;
+totalCount=62183;
 count1=0;
 count2=0;
-
 var sources = new PathwaySearch("https://beta.openphacts.org/2.1", "673a7995", "1445635a05fa1abfc159001e7b9c49fa");
 var sources2 = new CompoundSearch("https://beta.openphacts.org/2.1", "673a7995", "1445635a05fa1abfc159001e7b9c49fa");
-
 var callback = function(success, status, response){
   count1=count1+1;
   if (success && status == 200) {
@@ -89,7 +98,6 @@ var callback = function(success, status, response){
     count = response.primaryTopic.interactions_count
     console.log("Hit count " + count);
  d3.select("#number1").html(count);
-
  endstring=response._about
  endstring=endstring.substring(endstring.length-9,endstring.length)
  numberArray=parseInt(endstring.substring(4,9))
@@ -102,29 +110,31 @@ var callback = function(success, status, response){
 if(count1==totalCount&&count2==totalCount){
        youhou="";
        for(i=1;i<=totalCount;i++){
-       
+
        youhou+=list[i]+","+listIK[i]+","+listMF[i]+"\n";
      }
     d3.select("#json3").html(youhou);
     }
 };
-
 var callback2 = function(success, status, response){
   count2=count2+1;
   if (success && status == 200) {
     d3.select("#json2").html(JSON.stringify(response, undefined, 2));
-    
+
     endstring=response.primaryTopic._about
     endstring=endstring.substring(endstring.length-9,endstring.length)
     numberArray=parseInt(endstring.substring(4,9))
     console.log(numberArray)
-    
+
+
     for(var i = 0; i<response.primaryTopic.exactMatch.length; i++){
             //Check if it uses the right Dataset
             if (response.primaryTopic.exactMatch[i].inDataset == "http://ops.rsc.org"){
                 //Retrieve molecular formula and inchi key from the database.
                 moleformula = response.primaryTopic.exactMatch[i].molformula;
                 inchikeyy = response.primaryTopic.exactMatch[i].inchikey;
+
+
 }
 listIK[numberArray]=inchikeyy
 listMF[numberArray]=moleformula
@@ -132,6 +142,7 @@ console.log("molecular Formula" + moleformula);
 d3.select("#molformula1").html(moleformula);
 console.log("Inchi Key " + inchikeyy);
 d3.select("#inchikey1").html(inchikeyy);}
+
   }
    else {
     d3.select("#json2").html("Error while calling the compoundPharmacology webservice: " + status + " " + success);
@@ -139,14 +150,12 @@ d3.select("#inchikey1").html(inchikeyy);}
   if(count1==totalCount&&count2==totalCount){
        youhou="";
        for(i=1;i<=totalCount;i++){
-       
+
        youhou+=list[i]+","+listIK[i]+","+listMF[i]+"\n";
      }
     d3.select("#json3").html(youhou);
     }
 };
-
-
 for(i=1;i<=totalCount;i++){
   if(i<10000){
     a=0;
@@ -164,8 +173,6 @@ if (i<10){
 }else d="";
   sources.countInteractionsByEntity("http://www.hmdb.ca/metabolites/HMDB"+a+b+c+d+i, null, null, null, callback);
   sources2.fetchCompound("http://www.hmdb.ca/metabolites/HMDB"+a+b+c+d+i, null, callback2);
-
-
 }
 var list=[];
 console.log(list);
@@ -173,8 +180,10 @@ var listIK=[];
 console.log(listIK);
 var listMF=[];
 console.log(listMF);
-
   </script>
 
 </body>
 </html>
+Contact GitHub API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Status Help
+
