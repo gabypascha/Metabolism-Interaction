@@ -58,17 +58,19 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
 
   <h5>Number</h5>
   <div class="number" id="number1">Pending...</div>
-  <h7>Inchi Key</h7>
+  <h5>Inchi Key</h5>
   <div class="inchikey" id="inchikey1">Pending...</div>
-  <h8>Molecular Formula</h8>
+  <h5>Molecular Formula</h5>
   <div class="molformula" id="molformula1">Pending...</div>
-  <h9>list?</h9>
+  <h5>list?</h5>
   <div class="maxtrix" id="maxtrix1">Pending...</div>
 
   <h4>JSON 1</h4>
   <div class="json" id="json1">Pending...</div>
-  <h6>JSON 2</h6>
+  <h4>JSON 2</h4>
   <div class="json" id="json2">Pending...</div>
+  <h4>JSON 3</h4>
+  <div class="json" id="json3">Pending...</div>
 
 
   <script type="text/javascript">
@@ -98,27 +100,38 @@ var callback = function(success, status, response){
     d3.select("#json1").html("Error while calling the compoundPharmacology webservice: " + status + " " + success);
   }
 if(count1==totalCount&&count2==totalCount){
-   d3.select("#json1").html(list[1]);
-}
+       youhou="";
+       for(i=1;i<=totalCount;i++){
+       
+       youhou+=list[i]+","+listIK[i]+","+listMF[i]+"\n";
+     }
+    d3.select("#json3").html(youhou);
+    }
 };
 
 var callback2 = function(success, status, response){
   count2=count2+1;
   if (success && status == 200) {
     d3.select("#json2").html(JSON.stringify(response, undefined, 2));
-    inchikeyy = response.primaryTopic.exactMatch[0].inchiKey
-    console.log("Inchi Key " + inchikeyy);
-    d3.select("#inchikey1").html(inchikeyy);
-    moleformula = response.primaryTopic.exactMatch[1].molformula
-    console.log("molecular Formula" + moleformula);
-    d3.select("#molformula1").html(moleformula);
-
+    
     endstring=response.primaryTopic._about
     endstring=endstring.substring(endstring.length-9,endstring.length)
     numberArray=parseInt(endstring.substring(4,9))
     console.log(numberArray)
-    listIK[numberArray]=inchikeyy
-    listMF[numberArray]=moleformula
+    
+    for(var i = 0; i<response.primaryTopic.exactMatch.length; i++){
+            //Check if it uses the right Dataset
+            if (response.primaryTopic.exactMatch[i].inDataset == "http://ops.rsc.org"){
+                //Retrieve molecular formula and inchi key from the database.
+                moleformula = response.primaryTopic.exactMatch[i].molformula;
+                inchikeyy = response.primaryTopic.exactMatch[i].inchikey;
+}
+listIK[numberArray]=inchikeyy
+listMF[numberArray]=moleformula
+console.log("molecular Formula" + moleformula);
+d3.select("#molformula1").html(moleformula);
+console.log("Inchi Key " + inchikeyy);
+d3.select("#inchikey1").html(inchikeyy);}
   }
    else {
     d3.select("#json2").html("Error while calling the compoundPharmacology webservice: " + status + " " + success);
@@ -129,7 +142,7 @@ var callback2 = function(success, status, response){
        
        youhou+=list[i]+","+listIK[i]+","+listMF[i]+"\n";
      }
-    d3.select("#json2").html(youhou);
+    d3.select("#json3").html(youhou);
     }
 };
 
