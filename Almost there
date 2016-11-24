@@ -58,12 +58,11 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
 
   <h5>Number</h5>
   <div class="number" id="number1">Pending...</div>
-  <h7>Inchi Key</h7>
+  <h5>Inchi Key</h5>
   <div class="inchikey" id="inchikey1">Pending...</div>
-  <h8>Molecular Formula</h8>
+  <h5>Molecular Formula</h5>
   <div class="molformula" id="molformula1">Pending...</div>
-  <h9>list?</h9>
-  <div class="maxtrix" id="maxtrix1">Pending...</div>
+
 
   <h4>JSON 1</h4>
   <div class="json" id="json1">Pending...</div>
@@ -76,7 +75,7 @@ Copyright (c) 2013-2015  Egon Willighagen <egon.willighagen@maastrichtuniversity
 var sources = new PathwaySearch("https://beta.openphacts.org/2.1", "673a7995", "1445635a05fa1abfc159001e7b9c49fa");
 var sources2 = new CompoundSearch("https://beta.openphacts.org/2.1", "673a7995", "1445635a05fa1abfc159001e7b9c49fa");
 
-var callback = function(success, status, response,i){
+var callback = function(success, status, response){
   if (success && status == 200) {
     d3.select("#json1").html(JSON.stringify(response, undefined, 2));
     count = response.primaryTopic.interactions_count
@@ -105,7 +104,7 @@ var callback2 = function(success, status, response){
     console.log("molecular Formula" + moleformula);
     d3.select("#molformula1").html(moleformula);
 
-    endstring=response._about
+    endstring=response.primaryTopic._about
     endstring=endstring.substring(endstring.length-9,endstring.length)
     numberArray=parseInt(endstring.substring(4,9))
     console.log(numberArray)
@@ -136,7 +135,7 @@ if (i<10){
   d=0;
 }else d="";
   sources.countInteractionsByEntity("http://www.hmdb.ca/metabolites/HMDB"+a+b+c+d+i, null, null, null, callback);
-  sources2.fetchCompound("http://www.hmdb.ca/metabolites/HMDB01206", null, callback2);
+  sources2.fetchCompound("http://www.hmdb.ca/metabolites/HMDB"+a+b+c+d+i, null, callback2);
 
 
 }
